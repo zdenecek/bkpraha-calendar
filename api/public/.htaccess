@@ -1,0 +1,15 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Condition to check for existing .css files
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME} \.css$ [NC]
+RewriteRule ^ - [L]
+
+# Condition to check for existing .png files
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME} \.png$ [NC]
+RewriteRule ^ - [L]
+
+# Redirect all other requests to index.php
+RewriteRule ^ index.php [L]
