@@ -54,15 +54,27 @@ $optParams = [
 
     foreach ($results->getItems() as $event) {
         $start = $event->start->dateTime;
-        if (empty($start)) {
+        $allDay = empty($start);
+        if ($allDay) {
             $start = $event->start->date;
         }
-        
+
+        $end = $event->end->dateTime;
+        if (empty($end)) {
+            $end = $event->end->date;
+        }
+        $end = new DateTime($end);
+        if ($allDay) {
+            // Google reports all day events with an exclusive end date.
+            $end->modify('-1 day');
+        }
+
         $processedTitle = processEventTitle($event->getSummary());
 
         $events[] = array_merge([
-            'titleShort' => $event->getSummary(), 
-            'start' => new DateTime($start)
+            'titleShort' => $event->getSummary(),
+            'start' => new DateTime($start),
+            'end' => $end
         ],        $processedTitle);
     }
 

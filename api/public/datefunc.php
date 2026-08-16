@@ -18,6 +18,34 @@ $daysWithPrepositions = [
     'neděle' => 'V neděli'
 ];
 
+$daysInGenitive = [
+    'pondělí' => 'pondělí',
+    'úterý' => 'úterý',
+    'středa' => 'středy',
+    'čtvrtek' => 'čtvrtka',
+    'pátek' => 'pátku',
+    'sobota' => 'soboty',
+    'neděle' => 'neděle'
+];
+
+function spansMoreDays($start, $end) {
+    return $end && $start->format('Y-m-d') !== $end->format('Y-m-d');
+}
+
+function formatDateRangeToCzech($start, $end) {
+
+    global $formatter, $daysInGenitive;
+
+    $formatter->setPattern('EEEE');
+    $startDay = $daysInGenitive[$formatter->format($start)] ?? '';
+    $endDay = $daysInGenitive[$formatter->format($end)] ?? '';
+
+    $formatter->setPattern('d. M.');
+
+    return 'Od ' . ($startDay ? $startDay . ' ' : '') . $formatter->format($start)
+        . ' do ' . ($endDay ? $endDay . ' ' : '') . $formatter->format($end);
+}
+
 function formatDateToCzechIn($date)  {
 
     global $formatter, $daysWithPrepositions;

@@ -18,7 +18,9 @@ $bg = $_GET['bg'] ?? 'white';
         <?= $event['title'] ?>
     </h3>
 
-    <?= formatDateToCzechIn($event['start']) ?> <?= $event['verb'] ?> <?= $event['titleFull']  ?>.
+    <?= spansMoreDays($event['start'], $event['end'])
+            ? formatDateRangeToCzech($event['start'], $event['end'])
+            : formatDateToCzechIn($event['start']) ?> <?= $event['verb'] ?> <?= $event['titleFull']  ?>.
 </div>
 
 <?php endforeach; ?>
