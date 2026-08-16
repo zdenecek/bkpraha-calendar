@@ -1,4 +1,17 @@
 
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
 RewriteEngine on
+
+RewriteRule ^(\.|keys/) - [F,L]
+
 RewriteRule ^$ public/ [L]
 RewriteRule (.*) public/$1 [L]

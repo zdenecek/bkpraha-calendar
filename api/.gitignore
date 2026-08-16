@@ -1,3 +1,4 @@
 vendor/
-keys/
+keys/*
+!keys/.htaccess
 .env
