@@ -1,0 +1,34 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - api/**
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+      - name: Install dependencies
+        working-directory: api
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+      - name: Upload via FTP
+        uses: zdenecek/zip-ftp-php-unzip@main
+        with:
+          zip_source: api
+          ftp_host: ${{ secrets.FTP_HOST }}
+          ftp_user: ${{ secrets.FTP_USER }}
+          ftp_password: ${{ secrets.FTP_PASSWORD }}
+          ftp_remote_path: /
+          php_script_url: https://calendar.bkpraha.cz
