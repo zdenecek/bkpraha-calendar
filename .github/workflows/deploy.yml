@@ -23,6 +23,30 @@ jobs:
       - name: Install dependencies
         working-directory: api
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+      - name: Create .env file
+        env:
+          GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
+        run: |
+          if [ -z "$GOOGLE_CALENDAR_ID" ]; then
+            echo "::error::secret GOOGLE_CALENDAR_ID is not set"
+            exit 1
+          fi
+          printf 'GOOGLE_CALENDAR_ID=%s\nGOOGLE_KEY_FILE=keys/key.json\n' "$GOOGLE_CALENDAR_ID" > api/.env
+      - name: Create service account key file
+        env:
+          GOOGLE_KEY_BASE64: ${{ secrets.GOOGLE_KEY_BASE64 }}
+        run: |
+          if [ -z "$GOOGLE_KEY_BASE64" ]; then
+            echo "::error::secret GOOGLE_KEY_BASE64 is not set"
+            exit 1
+          fi
+          mkdir -p api/keys
+          printf '%s' "$GOOGLE_KEY_BASE64" | base64 -d > api/keys/key.json
+          php -r '$k = json_decode(file_get_contents("api/keys/key.json"), true);
+                  if (!is_array($k) || empty($k["private_key"])) {
+                      fwrite(STDERR, "GOOGLE_KEY_BASE64 did not decode to a service account key\n");
+                      exit(1);
+                  }'
       - name: Upload via FTP
         uses: zdenecek/zip-ftp-php-unzip@main
         with:
