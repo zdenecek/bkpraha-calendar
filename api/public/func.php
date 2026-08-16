@@ -24,26 +24,31 @@ $service = new Google_Service_Calendar($client);
 
 
 // Fetch events from the calendar
-function fetchEvents($calendarId, $year, $month = null) {
-    global $service;
+function fetchEvents($limit=50, $date_from=null, $date_to=null ) {
+    global $service, $calendarId;
     $events = [];
+// Set default date_from to today if not provided
+if ($date_from === null) {
+    $date_from = date('Y-m-d') . 'T00:00:00Z';  // Start from today
+} else {
+    $date_from = date('Y-m-d', strtotime($date_from)) . 'T00:00:00Z';  // Ensure correct formatting
+}
 
-    // Time min and max for the specific year
-    if ($month) {
-        $timeMin = "{$year}-{$month}-01T00:00:00Z";
-        $timeMax = "{$year}-{$month}-31T23:59:59Z";
-    } else {
-        $timeMin = "{$year}-01-01T00:00:00Z";
-        $timeMax = "{$year}-12-31T23:59:59Z";
-    }
+// Set default date_to to three years from today if not provided
+if ($date_to === null) {
+    $date_to = date('Y-m-d', strtotime('+3 years')) . 'T23:59:59Z';  // End three years from now
+} else {
+    $date_to = date('Y-m-d', strtotime($date_to)) . 'T23:59:59Z';  // Ensure correct formatting
+}
 
-    // Parameters for the API call
-    $optParams = [
-        'timeMin' => $timeMin,
-        'timeMax' => $timeMax,
-        'singleEvents' => true,
-        'orderBy' => 'startTime'
-    ];
+// Prepare parameters for the Google Calendar API request
+$optParams = [
+    'timeMin' => $date_from,
+    'timeMax' => $date_to,
+    'singleEvents' => true,
+    'orderBy' => 'startTime',
+    'maxResults' => $limit
+];
 
     $results = $service->events->listEvents($calendarId, $optParams);
 
@@ -80,7 +85,15 @@ function processEventTitle($title) {
         'CSL' => 'Celostátní liga',
         'MČR' => 'Mistrovství České republiky',
         'MBF' => 'Mezinárodní bridžový festival',
-        'MM' => 'Mezinárodní mistrovství'
+        'MM' => 'Mezinárodní mistrovství',
+        'MŠ' => 'Malý švýcarák',
+        'Š' => 'Švýcarská skupinovka',
+        'A' => 'Skupinovka A',
+        'B' => 'Skupinovka B',
+        'PL' => 'Pražská liga',
+        'IMP' => 'Impový přebor BKP',
+        'TOP' => 'Topový přebor BKP',
+        'K' => 'Kurz Zdeňka Frabši pro pokročilé'
     ];
 
     $genitive_mapping = [
@@ -88,27 +101,43 @@ function processEventTitle($title) {
         'SKA' => 'Skupinovky A',
         'SKB' => 'Skupinovky B',
         'SKS' => 'Švýcarské skupinovky',
+        'Š' => 'Švýcarské skupinovky',
+        'A' => 'Skupinovky A',
+        'B' => 'Skupinovky B',
+        'PL' => 'Pražské ligy'
+    ];
+
+    $verb_mapping = [
+        'K' => 'se koná'
     ];
 
 
-    if (preg_match('/([A-Z]+) #(\d+)/', $title, $matches)) {
+    if (preg_match('/(A|B|PL|Š)(\d+)/', $title, $matches)) {
         $code = $matches[1];
         $round = $matches[2];
         $res = [
             'title' => $mapping[$code] ?? $code,
             'round' => $round,
+            'verb' => $verb_mapping[$code] ?? 'se hraje',
         ];
+
+        if ($round) {
 
             $res['titleFull'] = array_key_exists($code, $genitive_mapping) ?
                  $round . ". kolo " . $genitive_mapping[$code]
                  : $res['title'];
-
+        }
+        else {
+            $res['titleFull'] = $res['title'];
+        }
 
         return $res;
     } else {
         // For custom titles, use the title as is and set round to null
         return [
             'title' => $mapping[$title] ?? $title,
+            'titleFull' => $mapping[$title] ?? $title,
+            'verb' => $verb_mapping[$title] ?? 'se hraje',
         ];
     }
 }

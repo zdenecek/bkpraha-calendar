@@ -1,19 +1,24 @@
 <?php 
 require_once 'datefunc.php';
 $limit = 10;
+$events = fetchEvents($limit);
+$bg = $_GET['bg'] ?? 'white';
 ?>
 
 <div class="column">
 
 <?php foreach (array_slice($events, 0, $limit) as $event):  ?>
 
+<?php if ($event !== reset($events)): ?>
 <div class="line"><hr></div>
+<?php endif; ?>
+
 <div class="event">
     <h3>
         <?= $event['title'] ?>
     </h3>
 
-    <?= formatDateToCzechIn($event['start']) ?> se hraje <?= $event['titleFull']  ?>.
+    <?= formatDateToCzechIn($event['start']) ?> <?= $event['verb'] ?> <?= $event['titleFull']  ?>.
 </div>
 
 <?php endforeach; ?>
@@ -21,8 +26,9 @@ $limit = 10;
 </div>
 <style>
 
-    .column {
-        background-color: #ECEFF1;
+    body {
+        background-color: <?= $bg ?>;
+        margin: 0;
     }
 
  .line {
@@ -31,7 +37,6 @@ $limit = 10;
     width: 100%;
     display: block;
     margin: 0 auto;
-    padding: 1.25rem;
     padding-top: .625rem;
     padding-bottom: .625rem;
  }
@@ -69,10 +74,17 @@ $limit = 10;
     margin: 0 auto;
     word-wrap: break-word;
     word-break: break-word;
-    padding: 1.25rem;
     padding-top: .75rem;
     padding-bottom: .75rem;
     max-width: 100%!important;
+ }
+
+ .event:first-child {
+    padding-top: 0;
+ }
+
+ .event:last-child {
+    padding-bottom: 0;
  }
 
  .event h3 {
