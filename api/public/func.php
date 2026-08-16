@@ -111,6 +111,15 @@ function processEventTitle($title) {
         'K' => 'se koná'
     ];
 
+    // Entry deadlines carry the subject in the verb, so the sentence uses only
+    // what the deadline is for: "13. 9. se uzavírají přihlášky A, B, MŠ."
+    if (preg_match('/^Přihlášky\s+(.+)$/u', $title, $matches)) {
+        return [
+            'title' => $title,
+            'titleFull' => $matches[1],
+            'verb' => 'se uzavírají přihlášky',
+        ];
+    }
 
     if (preg_match('/(A|B|PL|Š)(\d+)/', $title, $matches)) {
         $code = $matches[1];
