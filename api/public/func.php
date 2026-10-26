@@ -105,7 +105,10 @@ function processEventTitle($title) {
         'PL' => 'Pražská liga',
         'IMP' => 'Impový přebor BKP',
         'TOP' => 'Topový přebor BKP',
-        'K' => 'Kurz Zdeňka Frabši pro pokročilé'
+        'K' => 'Kurz Zdeňka Frabši pro pokročilé',
+        'KZ' => 'Kurz Zdeňka Frabši pro začátečníky',
+        'KA' => 'Kurz Zdeňka Frabši pro absolventy',
+        'KP' => 'Kurz Zdeňka Frabši pro pokročilé'
     ];
 
     $genitive_mapping = [
@@ -120,7 +123,10 @@ function processEventTitle($title) {
     ];
 
     $verb_mapping = [
-        'K' => 'se koná'
+        'K' => 'se koná',
+        'KZ' => 'se koná',
+        'KA' => 'se koná',
+        'KP' => 'se koná'
     ];
 
     // Entry deadlines carry the subject in the verb, so the sentence uses only
